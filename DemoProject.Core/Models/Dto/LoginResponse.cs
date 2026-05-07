@@ -1,4 +1,4 @@
-namespace DemoProject.Models.Dto;
+namespace DemoProject.Core.Models.Dto;
 
 public class LoginResponse
 {
