@@ -29,6 +29,10 @@ DemoProject/
 │   └── AppDbContext.cs          # EF Core DbContext
 ├── Database/
 │   └── init.sql                 # 建表 SQL + 假資料
+├── doc/
+│   ├── architecture.md          # 系統架構圖
+│   ├── jwt-flow.md              # JWT 驗證流程圖
+│   └── budget-flow.md           # 預算審核流程圖
 ├── Models/
 │   ├── ApiResponse.cs           # 統一回應格式
 │   ├── Entities/                # 資料庫實體
@@ -78,6 +82,7 @@ DemoProject/
 Draft（草稿）→ Reviewing（審核中）→ Approved（已核准）
 ```
 - 狀態為 `Approved` 時，金額不可再修改
+- 詳細流程圖請參考 [doc/budget-flow.md](doc/budget-flow.md)
 
 ---
 
@@ -91,7 +96,6 @@ Draft（草稿）→ Reviewing（審核中）→ Approved（已核准）
 
 **1. 建立資料庫**
 ```sql
--- 在 SQL Server 執行
 CREATE DATABASE DemoProject;
 ```
 
@@ -123,13 +127,14 @@ https://localhost:{port}/swagger
 
 ## 測試帳號
 
-| 帳號 | 密碼 | 角色 |
-|------|------|------|
-| `admin` | `Admin@123` | Admin（可刪除商品） |
-| `user1` | `User@123` | User |
+專案內建兩組測試帳號，角色分別為 `Admin` 與 `User`。
+
+> 帳號資訊請洽作者，或於本機執行後參考 `Database/init.sql` 內的說明。
 
 ### 登入流程
 1. 呼叫 `POST /api/auth/login` 取得 Token
 2. 點 Swagger 右上角 **Authorize**
 3. 輸入 `Bearer {token}`
 4. 即可呼叫所有需要登入的 API
+
+詳細 JWT 驗證流程請參考 [doc/jwt-flow.md](doc/jwt-flow.md)
