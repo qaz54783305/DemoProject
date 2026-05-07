@@ -1,4 +1,4 @@
-namespace DemoProject.Models;
+namespace DemoProject.Core.Models;
 
 public class ApiResponse<T>
 {

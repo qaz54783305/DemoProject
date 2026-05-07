@@ -1,5 +1,5 @@
-using DemoProject.Data;
-using DemoProject.Services;
+using DemoProject.Core.Data;
+using DemoProject.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +11,9 @@ namespace DemoProject.Controllers;
 public class ExcelController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly ExcelExportService _excel;
+    private readonly IExcelExportService _excel;
 
-    public ExcelController(AppDbContext db, ExcelExportService excel)
+    public ExcelController(AppDbContext db, IExcelExportService excel)
     {
         _db = db;
         _excel = excel;

@@ -1,4 +1,4 @@
-namespace DemoProject.Models.Entities;
+namespace DemoProject.Core.Models.Entities;
 
 public class Product
 {

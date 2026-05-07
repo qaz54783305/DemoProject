@@ -1,6 +1,7 @@
 using System.Text;
-using DemoProject.Data;
-using DemoProject.Services;
+using DemoProject.Core.Data;
+using DemoProject.Core.Services;
+using DemoProject.Core.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,10 +12,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<ExcelExportService>();
+// JwtSettings 注入
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
+builder.Services.AddSingleton(jwtSettings);
 
-// JWT 驗證
-var jwtKey = builder.Configuration["Jwt:Key"]!;
+// Service 注入
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -24,9 +31,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
         };
     });
 builder.Services.AddAuthorization();
@@ -35,12 +42,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "DemoProject API",
-        Version = "v1",
-        Description = "展示用 API，包含 JWT 登入、商品管理、預算管理、Excel 匯出"
-    });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "DemoProject API", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT 授權，格式：Bearer {token}",
@@ -62,13 +64,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
-// 啟動時初始化假資料
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}
 
 if (app.Environment.IsDevelopment())
 {

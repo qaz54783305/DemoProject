@@ -1,20 +1,18 @@
-using DemoProject.Models.Entities;
+using DemoProject.Core.Models.Entities;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
 
-namespace DemoProject.Services;
+namespace DemoProject.Core.Services;
 
-public class ExcelExportService
+public class ExcelExportService : IExcelExportService
 {
     public byte[] ExportProducts(List<Product> products)
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("商品清單");
 
-        // 標題列樣式
         SetHeaderStyle(sheet.Cells[1, 1, 1, 6]);
         sheet.Cells[1, 1].Value = "編號";
         sheet.Cells[1, 2].Value = "商品名稱";
@@ -34,9 +32,7 @@ public class ExcelExportService
             sheet.Cells[row, 5].Value = p.UnitPrice;
             sheet.Cells[row, 5].Style.Numberformat.Format = "#,##0";
             sheet.Cells[row, 6].Value = p.Stock;
-
-            if (i % 2 == 1)
-                SetAlternateRowStyle(sheet.Cells[row, 1, row, 6]);
+            if (i % 2 == 1) SetAlternateRowStyle(sheet.Cells[row, 1, row, 6]);
         }
 
         ApplyBorderAndAutoFit(sheet, products.Count, 6);
@@ -46,7 +42,6 @@ public class ExcelExportService
     public byte[] ExportBudgets(List<Budget> budgets)
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("預算報表");
 
@@ -73,18 +68,15 @@ public class ExcelExportService
             sheet.Cells[row, 6].Style.Numberformat.Format = "#,##0";
             sheet.Cells[row, 7].Value = b.Status;
 
-            // 狀態欄位顏色
             var statusColor = b.Status switch
             {
-                "Approved"  => Color.FromArgb(198, 239, 206), // 綠
-                "Reviewing" => Color.FromArgb(255, 235, 156), // 黃
-                _           => Color.FromArgb(255, 199, 206)  // 紅（Draft）
+                "Approved"  => Color.FromArgb(198, 239, 206),
+                "Reviewing" => Color.FromArgb(255, 235, 156),
+                _           => Color.FromArgb(255, 199, 206)
             };
             sheet.Cells[row, 7].Style.Fill.PatternType = ExcelFillStyle.Solid;
             sheet.Cells[row, 7].Style.Fill.BackgroundColor.SetColor(statusColor);
-
-            if (i % 2 == 1)
-                SetAlternateRowStyle(sheet.Cells[row, 1, row, 6]);
+            if (i % 2 == 1) SetAlternateRowStyle(sheet.Cells[row, 1, row, 6]);
         }
 
         ApplyBorderAndAutoFit(sheet, budgets.Count, 7);
@@ -111,9 +103,6 @@ public class ExcelExportService
         var range = sheet.Cells[1, 1, dataCount + 1, colCount];
         range.AutoFitColumns();
         var border = range.Style.Border;
-        border.Top.Style    = ExcelBorderStyle.Thin;
-        border.Bottom.Style = ExcelBorderStyle.Thin;
-        border.Left.Style   = ExcelBorderStyle.Thin;
-        border.Right.Style  = ExcelBorderStyle.Thin;
+        border.Top.Style = border.Bottom.Style = border.Left.Style = border.Right.Style = ExcelBorderStyle.Thin;
     }
 }
