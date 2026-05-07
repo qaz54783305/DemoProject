@@ -8,14 +8,14 @@ sequenceDiagram
     participant Auth as AuthController
     participant DB as SQL Server
 
-    Client->>Auth: POST /api/auth/login\n{ username, password }
+    Client->>Auth: POST /api/auth/login
     Auth->>Auth: SHA256 雜湊密碼
     Auth->>DB: 查詢 Users 資料表
     DB-->>Auth: 回傳使用者資料
 
     alt 帳號密碼正確
-        Auth->>Auth: 產生 JWT Token\n(包含 username、role、60分鐘效期)
-        Auth-->>Client: 200 OK\n{ token, username, role, expiration }
+        Auth->>Auth: 產生 JWT Token
+        Auth-->>Client: 200 OK - token / username / role / expiration
     else 帳號密碼錯誤
         Auth-->>Client: 401 Unauthorized
     end
@@ -32,16 +32,16 @@ sequenceDiagram
     participant Controller as Controller
     participant DB as SQL Server
 
-    Client->>MW: GET /api/product\nAuthorization: Bearer {token}
+    Client->>MW: GET /api/product (Authorization: Bearer token)
 
     alt Token 有效
         MW->>Controller: 通過驗證，傳入使用者資訊
         Controller->>DB: 查詢資料
         DB-->>Controller: 回傳資料
-        Controller-->>Client: 200 OK + 資料
+        Controller-->>Client: 200 OK
     else Token 無效或過期
         MW-->>Client: 401 Unauthorized
-    else 權限不足（例如非 Admin 呼叫刪除）
+    else 權限不足
         MW-->>Client: 403 Forbidden
     end
 ```
