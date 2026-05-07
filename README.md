@@ -1,5 +1,7 @@
 # DemoProject API
 
+抽出一點工作用的模組展示
+
 ASP.NET Core 8 Web API 展示專案，包含 JWT 驗證、商品管理、預算審核流程與 Excel 匯出功能。
 
 ---
