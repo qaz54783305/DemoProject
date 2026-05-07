@@ -15,7 +15,7 @@ graph TD
     subgraph Models
         Entity["Entities\nUser / Product / Budget"]
         DTO["DTO\nLoginRequest / ProductDto / BudgetDto"]
-        Response["ApiResponse&lt;T&gt;"]
+        Response["ApiResponse(T)"]
     end
 
     DB[("SQL Server\nDemoProject")]

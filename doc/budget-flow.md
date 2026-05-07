@@ -5,14 +5,10 @@
 ```mermaid
 stateDiagram-v2
     [*] --> Draft : 新增預算
-    Draft --> Reviewing : 送審\nPATCH /api/budget/{id}/status
-    Reviewing --> Approved : 核准\nPATCH /api/budget/{id}/status
-    Reviewing --> Draft : 退回\nPATCH /api/budget/{id}/status
+    Draft --> Reviewing : 送審
+    Reviewing --> Approved : 核准
+    Reviewing --> Draft : 退回
     Approved --> [*]
-
-    note right of Draft : 可修改金額
-    note right of Reviewing : 可修改金額
-    note right of Approved : 金額鎖定，不可修改
 ```
 
 ---
@@ -36,23 +32,23 @@ sequenceDiagram
     participant API as BudgetController
     participant DB as SQL Server
 
-    User->>API: POST /api/budget\n新增預算（自動為 Draft）
+    User->>API: POST /api/budget
     API->>DB: INSERT Budget (Status = Draft)
     DB-->>API: 成功
     API-->>User: 200 OK
 
-    User->>API: PATCH /api/budget/{id}/status\n{ status: "Reviewing" }
+    User->>API: PATCH /api/budget/1/status (Reviewing)
     API->>DB: UPDATE Status = Reviewing
     DB-->>API: 成功
     API-->>User: 200 OK
 
-    Manager->>API: PATCH /api/budget/{id}/status\n{ status: "Approved" }
+    Manager->>API: PATCH /api/budget/1/status (Approved)
     API->>DB: UPDATE Status = Approved
     DB-->>API: 成功
     API-->>Manager: 200 OK
 
-    User->>API: PUT /api/budget/{id}\n嘗試修改已核准的預算
-    API-->>User: 400 BadRequest\n已核准的預算不可修改
+    User->>API: PUT /api/budget/1 (嘗試修改已核准的預算)
+    API-->>User: 400 BadRequest
 ```
 
 ---
